@@ -1,0 +1,30 @@
+<html>
+<head>
+</head>
+<body>
+    {% if error is not None %}
+    <p>{{error}}</p>
+    {% endif %}
+
+    {% if fullurl is not None %}
+    <p>Shortened Url: <a href="{{ fullurl }}">{{ fullurl }}</a></p>
+
+    <p>Full Url: {{ destination_url }}</p>
+    {% endif %}
+    
+    <p>Shorten url below<br />
+        Short code is optional. Use if you want to create a custom short link eg: {{ exampleurl }}.
+        </p>
+        <form action="/createlink" method="get">
+          {% csrf_token %}
+          <label for="destination_url">URL:</label>
+          <input type="text" id="destination_url" name="destination_url" value="{% if error %}{{ destination_url }}{% endif %}"><br><br>
+        
+          <label for="shorturl">Short Code:</label>
+          <input type="text" id="shorturl" name="shorturl" value="{% if error %}{{ shorturl }}{% endif %}"><br><br>
+        
+          <input type="submit" formmethod="post" value="Submit">
+        </form>
+</body>
+
+</html>
