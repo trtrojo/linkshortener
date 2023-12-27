@@ -1,6 +1,8 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views import View
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 from urllib import parse
 from django.db import IntegrityError
 from linkshortner import settings
@@ -19,7 +21,8 @@ class ShortWeb(View):
             'destination_url': request.GET.get('destination_url', ''),
             'shorturl': shorturl,
             'fullurl': fullurl,
-            'exampleurl': utils.get_full_url('myurl')
+            'exampleurl': utils.get_full_url('myurl'),
+            'user': request.user
         }
 
         return render(request, 'index.html', context=context)
@@ -30,8 +33,10 @@ class ShortWebCreate(View):
         return redirect('/', permanent=False)
     
     def post(self, request):
-
+        print(request.user)
         if request.user.is_authenticated or utils.ANONYMOUS_CREATION_ALLOWED:
+            curr_user = request.user if request.user.is_authenticated else None
+
             default_shorturl = utils.get_random_short_code()
             shorturl = request.POST.get('shorturl', '')
             custom_shorturl_used = True
@@ -46,7 +51,7 @@ class ShortWebCreate(View):
                 return redirect(f'/?error={parse.quote(err_msg)}', permanent=False)
 
             try:
-                shortened_link = ShortenedLink(shorturl=shorturl, destination_url=destination_url, created_by=request.user)
+                shortened_link = ShortenedLink(shorturl=shorturl, destination_url=destination_url, created_by=curr_user)
                 shortened_link.save()
             except IntegrityError:
                 if custom_shorturl_used:
@@ -63,7 +68,7 @@ class ShortWebCreate(View):
                         try:
                             shorturl = utils.get_random_short_code()
                             shortened_link = ShortenedLink(shorturl=shorturl, destination_url=destination_url, 
-                                                        created_by=request.user)
+                                                        created_by=curr_user)
                             shortened_link.save()
                             link_pending = False
                         except IntegrityError:
@@ -78,3 +83,59 @@ class ShortWebCreate(View):
             return redirect('/?error={}'.format(
                             parse.quote('You must be logged in in order to create new links.')
                         ))
+
+class LocalLogin(View):
+    def get(self, request):
+        return render(request, 'login.html')
+
+    def post(self, request):
+        user = authenticate(request, username=request.POST["username"],
+                            password=request.POST["password"])
+        if user:
+            login(request, user)
+            # messages.success(request, 'Logged in successfully')
+            return redirect('/')
+        else:
+            # messages.error(request, 'Logged in Fail')
+            return redirect('/login?error={}'.format(
+                parse.quote('Login failed.')
+            ))
+        
+class LocalLogout(View):
+    def get(self, request):
+        if request.user.is_authenticated:
+            logout(request)
+        
+        return redirect('/')
+    
+class CreateAccount(View):
+    def get(self, request):
+        if request.user.is_superuser:
+            return render(request, 'create.html')
+        else:
+            return redirect('/')
+
+    def post(self, request):
+        if request.user.is_superuser:
+            new_username = request.POST["username"]
+            new_password = request.POST["password"]
+
+            if len(new_username) == 0 or len(new_password) == 0:
+                return redirect('/createaccount?message={}'.format(
+                    parse.quote(f'You must supply a username and a password.')
+                ))                
+
+            try:
+                newuser = User.objects.create_user(username=new_username, password=new_password)
+                return redirect('/createaccount?message={}'.format(
+                    parse.quote(f'User {new_username} created successfully!')
+                ))
+            
+            except IntegrityError:
+                return redirect('/createaccount?message={}'.format(
+                    parse.quote(f'User {new_username} already exists!')
+                ))
+
+
+        else:
+            return redirect('/')

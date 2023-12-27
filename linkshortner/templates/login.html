@@ -1,0 +1,26 @@
+<html>
+<head>
+</head>
+<body>
+    {% if user.is_authenticated == True %}
+    <p>Hi {{ user.username }}! (<a href='/logout'>logout</a>)</p>
+    {% endif %}
+    
+    {% if request.GET.error is not None %}
+    <p>{{request.GET.error}}</p>
+    {% endif %}
+
+    <p>Please login below:<br /></p>
+        <form action="/login" method="post">
+          {% csrf_token %}
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username"><br><br>
+        
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password"><br><br>
+        
+          <input type="submit" formmethod="post" value="Submit">
+        </form>
+</body>
+
+</html>

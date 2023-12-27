@@ -2,6 +2,11 @@
 <head>
 </head>
 <body>
+    {% if user.is_authenticated == True %}
+    <p>Hi {{ user.username }}! (<a href='/logout'>logout</a>)</p>
+    {% else %}
+    <p><a href='/login'>login</a></p>
+    {% endif %}
     {% if error is not None %}
     <p>{{error}}</p>
     {% endif %}

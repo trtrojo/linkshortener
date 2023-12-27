@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-!+t41ah%u%5iujamf=js+r@gxe^zbgli7@9@p+%1ip55m&3^u$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -131,4 +131,4 @@ DEFAULT_SHORT_CODE_LENGTH = 6
 
 # BASE_SHORTENER_URL = 'http://localhost:8000'
 
-ANONYMOUS_CREATION_ALLOWED = False
+ANONYMOUS_CREATION_ALLOWED = True

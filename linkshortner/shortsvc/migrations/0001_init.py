@@ -7,8 +7,6 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    replaces = [('shortsvc', '0001_initial'), ('shortsvc', '0002_remove_shortenedlink_user_id_and_more'), ('shortsvc', '0003_shortenedlink_shorturl_alter_shortenedlink_id'), ('shortsvc', '0004_alter_shortenedlink_id'), ('shortsvc', '0005_shortenedlink_shortened_url_idx_and_more'), ('shortsvc', '0006_remove_shortenedlink_shortened_url_and_more'), ('shortsvc', '0007_urlsequence'), ('shortsvc', '0008_alter_shortenedlink_created_by')]
-
     initial = True
 
     dependencies = [
