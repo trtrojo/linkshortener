@@ -11,21 +11,31 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import environ
+import os
+
+env = environ.Env(
+    DEBUG=(bool, False),
+    ALLOWED_HOSTS=(str, 'localhost'),
+    ANONYMOUS_CREATION_ALLOWED=(bool, False)
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# load .env file
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-!+t41ah%u%5iujamf=js+r@gxe^zbgli7@9@p+%1ip55m&3^u$'
+
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 
 
 # Application definition
@@ -79,10 +89,7 @@ WSGI_APPLICATION = 'linkshortner.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': env.db()
 }
 
 
@@ -131,4 +138,4 @@ DEFAULT_SHORT_CODE_LENGTH = 6
 
 # BASE_SHORTENER_URL = 'http://localhost:8000'
 
-ANONYMOUS_CREATION_ALLOWED = True
+ANONYMOUS_CREATION_ALLOWED = env('ANONYMOUS_CREATION_ALLOWED')

@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:16
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: linkshortner
+      POSTGRES_USER: ls
+      POSTGRES_PASSWORD: shortenthemlinks
+  web:
+    build:
+      context: ./linkshortner
+      dockerfile: Dockerfile
+    volumes:
+      - ./linkshortner:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DEFAULT_ADMIN_USERNAME=admin
+      - DEFAULT_ADMIN_PASSWORD=admin
+      # - DATABASE_URL=sqlite:///db.db
+      - DATABASE_URL=postgres://ls:shortenthemlinks@db:5432/linkshortner
+      - DEBUG=True
+      - SECRET_KEY=secret
+      - ALLOWED_HOSTS=*
+      - ANONYMOUS_CREATION_ALLOWED=False
+    depends_on:
+      - db
